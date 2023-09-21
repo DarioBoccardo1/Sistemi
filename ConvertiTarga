@@ -1,0 +1,89 @@
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace ConvertiTarga
+{
+    internal class Program
+    {
+        static void Main(string[] args) // Dario Boccardo 4°E
+        {
+            string alfabeto = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            string targa = "";
+            char[] targaOrdinata = new char[7];
+            int[] targaConvertita = new int[7];
+            double numeroTarga = 0;
+            int cont = 0;
+
+            // Inserimento dati in input da parte dell'utente
+            Console.Write("Inserisci la targa: ");
+            targa = Console.ReadLine();
+
+            // iInvocazione dei metodi e stampa del risultato finale
+            FormaCanonica(targa, targaOrdinata);
+            ConvertiLettere(targaOrdinata, targaConvertita, alfabeto);
+            Console.WriteLine("");
+            Console.Write("Ecco il numero della targa: ");
+            Console.WriteLine(ConvertiTarga(targaConvertita, numeroTarga, cont));
+
+            Console.ReadLine();
+        }
+        static void FormaCanonica(string targa, char[] targaCanonica) // Riordina la targa nella forma AAAA000
+        {
+            for (int i = 0; i < targa.Length; i++)
+            {
+                if (i <= 1)
+                {
+                    targaCanonica[i] = targa[i];
+                }
+                else if (i >= 2 && i <= 4)
+                {
+                    targaCanonica[i + 2] = targa[i];
+                }
+                else
+                {
+                    targaCanonica[i - 3] = targa[i];
+                }
+            }
+        }
+        static void ConvertiLettere(char[] targaOrdinata, int[] targaCanonica, string alfabeto) // Converte nei numeri corispondenti le lettere della targa
+        {
+            for (int i = 0; i < targaOrdinata.Length - 3; i++)
+            {
+                for (int j = 0; j < alfabeto.Length; j++)
+                {
+                    if (targaOrdinata[i] == alfabeto[j])
+                    {
+                        targaCanonica[i] = j;
+                        j = 0;
+                        break;
+                    }
+                }
+            }
+            for (int i = 4; i < targaCanonica.Length; i++)
+            {
+                targaCanonica[i] = (int)Char.GetNumericValue(targaOrdinata[i]);
+            }
+        }
+        static int ConvertiTarga(int[] targaCanonica, double numeroTarga, int cont) // Converte la targa utilizzando le basi 10 e 26
+        {
+            int j = 0;
+            for (int i = targaCanonica.Length - 1; i >= 4; i--) // Ciclo for utilizzato per convertire i primi tre numeri della targa da destra
+            {
+                numeroTarga = targaCanonica[i] * Math.Pow(10, j);
+                cont = cont + (int)numeroTarga;
+                j++;
+            }
+            for (int i = targaCanonica.Length - 4; i >= 0; i--) // Ciclo for utilizzato per convertire la parte in base 26
+            {
+                numeroTarga = targaCanonica[i] * Math.Pow(10, 3) * Math.Pow(26, j - 3);
+                cont = cont + (int)numeroTarga;
+                j++;
+            }
+            return cont; // Ritorno le variabili int cont che contiene la somma delle conversioni della targa
+        }
+    }
+}
